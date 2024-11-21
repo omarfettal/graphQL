@@ -1,0 +1,73 @@
+# Enumerations for account and transaction types
+enum TypeCompte {
+    COURANT
+    EPARGNE
+}
+
+enum TypeTransaction {
+    DEPOT
+    RETRAIT
+}
+
+# Query definitions
+type Query {
+    allComptes: [Compte]                 # Fetch all accounts
+    compteById(id: ID): Compte           # Fetch a specific account by ID
+    totalSolde: SoldeStats               # Get aggregated statistics of all account balances
+    findByType(type: TypeCompte): [Compte] # Fetch accounts filtered by type
+    deleteCompte(id: ID): [Compte]       # Delete an account and return remaining accounts
+    compteTransactions(id: ID): [Transaction] # Fetch transactions for a specific account
+    transactionStats: TransactionStats   # Get statistics for all transactions
+}
+
+# Account type definition
+type Compte {
+    id: ID
+    solde: Float
+    dateCreation: String
+    type: TypeCompte
+    transactions: [Transaction]          # Transactions linked to this account
+}
+
+# Transaction type definition
+type Transaction {
+    id: ID
+    montant: Float
+    date: String
+    type: TypeTransaction
+    compte: Compte                      # The account associated with this transaction
+}
+
+# Mutation definitions
+type Mutation {
+    saveCompte(compte: CompteRequest): Compte    # Create or update an account
+    addTransaction(transaction: TransactionRequest): Transaction # Add a new transaction
+}
+
+# Input definitions
+input CompteRequest {
+    solde: Float
+    dateCreation: String
+    type: TypeCompte
+}
+
+input TransactionRequest {
+    montant: Float
+    date: String
+    compteId: ID
+    type: TypeTransaction
+}
+
+# Account balance statistics
+type SoldeStats {
+    count: Int
+    sum: Float
+    average: Float
+}
+
+# Transaction statistics
+type TransactionStats {
+    count: Int
+    sumDepots: Float
+    sumRetraits: Float
+}
